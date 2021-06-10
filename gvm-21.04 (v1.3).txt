@@ -1,0 +1,788 @@
+# Introduccion
+**Greenbone Vulnerability Management (GVM):
+
+GVM es un framework originalmente construido como un proyecto comunitario, denominado "OpenVAS" y es principalmente desarrollado y dirigido por Greenbone Networks. Consiste en Greenbone Vulnerability Manager Daemon (gvmd), Greenbone Security Assistant (GSA) con el Greenbone Security Assistant Daemon (gsad) y el aplicacion de escaneo ejecutable que corre las pruebas de vulnerabilidad (VT) contra los sistemas que son objeto de las pruebas.
+
+**Greenbone Vulnerability Manager Daemon (gvmd)
+
+Es el servicio central que consolida el escaneo simple de vulnerabilidades en una solucion completa de administracion de vulnerabilidad. gvmd controla el escaner OpenVAS a traves del Open Scanner Protocol (OSP).
+
+gvmd controla una base de datos PostgreSQL, donde todas las configuraciones y resultados de escaneos son centralizadamente almacenados. Ademas, gvmd maneja la administracion de usuarios incluyendo los permisos de control con grupos y roles.
+
+**Greenbone Security Assistant (GSA)
+
+GSA es la interface web de GVM con la que el usuario contra los escaneos y los accesos a las vulnerabilidades de la information. Es el punto de contacto principal para el usuario con el GVM. Se conecta al gvmd a través del servidor web Greenbone Security Assistant Daemon (gsad) para proveer una aplicacion web completa para la administracion de vulnerabilidades.
+
+**Escaner OpenVAS
+
+El pricipal escaner OpenVAS Scanner es un motor de escaneo con todas las funciones que ejecuta pruebas de vulnerabilidad (VTs) contra sistemas de destino. Para esto, usa las diariamente actualizadas bases, comercial Greenbone Security Feed (GSF) o libre Greenbone Community Feed (GCF).
+
+El escaner OpenVAS es controlado via Open Scanner Protocol (OSP). El demonio OSP del escaner OpenVAS (ospd-openvas) se comunica con el gvmd a traves del OSP (los datos de VT son coleccionados), los escaneos son iniciados y detenidos y los resultados son transferidos al gvmd a traves del ospd). 
+
+** Escaner OSP
+
+Los usuarios pueden desarrollar y conectar sus propios escaners OSP, usando el framework generico ospd scanner.
+
+** Clientes GMP
+
+El Greenbone Vulnerability Management Tools (gvm-tools) es una coleccion de herramientas que ayuda con el control remoto de un dispositivo Greenbone Security Manager (GSM) y su gvmd subyacente. Las herramientas ayudan en el acceso de los protocolos de comunicacion Greenbone Management Protocol (GMP) y OSP.
+
+# Requisitos minimos
+CPU: 4 nucleos
+M.RAM: 4 GB
+Espacio en disco para "/var": 30 GB
+
+#==============
+# SERVIDOR GVM
+#==============
+
+# 1. Prerequisitos
+Actualizacion del sistema
+apt update && apt -y upgrade
+
+dpkg-reconfigure locales
+Seleccionamos el idioma "en_US.UTF-8 UTF-8"
+locale-gen en_US.UTF-8 ;\
+export LC_ALL="C"
+
+Instalacion de herramientas y dependencias necesarias
+apt install -y sudo git rsync cmake gnutls-bin cmake pkg-config \
+libglib2.0-dev \
+libgpgme-dev \
+libgnutls28-dev \
+uuid-dev \
+libssh-gcrypt-dev \
+libhiredis-dev \
+libxml2-dev \
+libpcap-dev \
+libksba-dev \
+libnet1-dev \
+libldap2-dev \
+libradcli-dev \
+gcc-mingw-w64 \
+perl-base \
+doxygen \
+heimdal-dev \
+libpopt-dev \
+libglib2.0-dev \
+libunistring-dev \
+libjson-glib-dev \
+bison \
+libksba-dev \
+libsnmp-dev \
+libgcrypt20-dev \
+redis-server \
+libpq-dev \
+postgresql-server-dev-11 \
+libical-dev \
+xsltproc \
+xmltoman \
+xml-twig-tools \
+libmicrohttpd-dev \
+postgresql \
+postgresql-contrib \
+postgresql-server-dev-all \
+python3-paramiko \
+python3-lxml \
+python3-defusedxml \
+python3-pip \
+python3-venv \
+python-virtualenv
+
+Instalamos yarn (se requiere conexion a internet)
+apt install -y npm && npm install --global yarn
+
+# Creacion del usuario gvm y su directorio
+echo 'export PATH="$PATH:/opt/gvm/bin:/opt/gvm/sbin:/opt/gvm/.local/bin"' | sudo tee -a /etc/profile.d/gvm.sh ;\
+sudo chmod 0755 /etc/profile.d/gvm.sh ;\
+source /etc/profile.d/gvm.sh ;\
+sudo bash -c 'cat << EOF > /etc/ld.so.conf.d/gvm.conf
+# gmv libs location
+/opt/gvm/lib
+EOF'
+
+mkdir /opt/gvm/ ;\
+adduser gvm --disabled-password --home /opt/gvm/ --no-create-home --gecos '' ;\
+usermod -aG redis gvm ;\
+chown gvm:gvm /opt/gvm/
+
+# 3. Implementacion de GVM 21.4.0 desde codigo fuente
+Se requieren diferentes herramientas para instalar GVM. Ellas son:
+-gvm-libs
+-openvas-smb
+-openvas
+-gvmd
+-gsa
+-ospd
+-ospd-openvas
+-Python-GVM
+-GVM-Tools
+
+#Como estaremos corriendo GVM como un usuario no privilegiado, "gvm", entonces instalaremos los #ficheros de configuracion y librerias debajo del directorio "/opt/gvm/".
+
+#Actualizamos la ruta de las variables de entorno en "/etc/enviroment/", para incluir la ruta del #binario de GVM:
+#nano /etc/environment
+##################
+#PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/o#pt/gvm/bin:/opt/gvm/sbin:/opt/gvm/.local/bin"
+##################
+
+#Agregamos la ruta de la libreria de GVM a "/etc/ld.so.conf.d":
+#echo "/opt/gvm/lib" > /etc/ld.so.conf.d/gvm.conf
+
+#Cambiamos al usuario "gvm":
+#su - gvm
+
+#Creamos un directorio temporal para almacenar los ficheros fuentes:
+#mkdir gvm-source/
+
+su - gvm
+mkdir gvm-source ;\
+cd gvm-source ;\
+export PKG_CONFIG_PATH=/opt/gvm/lib/pkgconfig:$PKG_CONFIG_PATH
+
+Descargamos los paquetes comprimidos oficiales de las fuentes de GVM en Github:
+wget --no-verbose https://github.com/greenbone/gvm-libs/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv gvm-libs-21.4.0 gvm-libs
+wget --no-verbose https://github.com/greenbone/openvas-smb/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv openvas-smb-21.4.0 openvas-smb
+wget --no-verbose https://github.com/greenbone/openvas-scanner/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv openvas-scanner-21.4.0 openvas
+wget --no-verbose https://github.com/greenbone/ospd/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv ospd-21.4.0 ospd
+wget --no-verbose https://github.com/greenbone/ospd-openvas/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv ospd-openvas-21.4.0 ospd-openvas
+wget --no-verbose https://github.com/greenbone/gvmd/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv gvmd-21.4.0 gvmd
+wget --no-verbose  https://github.com/greenbone/gsa/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv gsa-21.4.0 gsa
+
+# 3.1. Instalar GVM 11 Libraries
+
+Compilando gvm-libs:
+cd /opt/gvm/gvm-source/gvm-libs/ ;\
+export PKG_CONFIG_PATH=/opt/gvm/lib/pkgconfig:$PKG_CONFIG_PATH ;\
+mkdir build && cd build ;\
+cmake -DCMAKE_INSTALL_PREFIX=/opt/gvm/ .. ;\
+make && make install ;\
+cd ../../
+
+# 3.2. Instalacion de OpenVAS SMB
+cd /opt/gvm/gvm-source/openvas-smb/ ;\
+export PKG_CONFIG_PATH=/opt/gvm/lib/pkgconfig:$PKG_CONFIG_PATH ;\
+mkdir build && cd build ;\
+cmake -DCMAKE_INSTALL_PREFIX=/opt/gvm .. ;\
+make && make install ;\
+cd ../../
+
+# 3.3. Instalacion de OpenVAS scanner
+cd /opt/gvm/gvm-source/openvas/ ;\
+export PKG_CONFIG_PATH=/opt/gvm/lib/pkgconfig:$PKG_CONFIG_PATH ;\
+mkdir build && cd build ;\
+cmake -DCMAKE_INSTALL_PREFIX=/opt/gvm .. ;\
+make && make install ;\
+cd ../../
+
+# 3.3.1. Configuracion del OpenVAS scanner
+Un numero de NVTs requieren de privilegios "root" para ejecutar ciertas operaciones. Como "openvas" es lanzado desde el proceso "ospd-openvas", a traves de sudo, agregaremos la siguiente linea a los sudoers para asegurar de que el usuario "gvm" usado pueda correr openvas con derechos elevados usando sudo sin password y actualizar el "secure_path" para incluir la rutas a "sbin" y "bin":
+exit
+visudo
+Dejamos la siguiente linea, como se muestra:
+########
+# [...]
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gvm/sbin:/opt/gvm/bin"
+# [...]
+# Permitir al usuario que corre el "ospd-openvas", lanzar comandos de GVM con permisos "root"
+gvm     ALL = NOPASSWD: /opt/gvm/sbin/openvas
+gvm     ALL = NOPASSWD: /opt/gvm/sbin/gsad
+########
+
+export LC_ALL="C" ;\
+ldconfig ;\
+cp /etc/redis/redis.conf /etc/redis/redis.orig ;\
+cp /opt/gvm/gvm-source/openvas/config/redis-openvas.conf /etc/redis/ ;\
+chown redis:redis /etc/redis/redis-openvas.conf ;\
+echo "db_address = /run/redis-openvas/redis.sock" > /opt/gvm/etc/openvas/openvas.conf ;\
+systemctl enable redis-server@openvas.service ;\
+systemctl start redis-server@openvas.service
+
+sysctl -w net.core.somaxconn=1024
+sysctl vm.overcommit_memory=1
+
+echo "net.core.somaxconn=1024"  >> /etc/sysctl.conf
+echo "vm.overcommit_memory=1" >> /etc/sysctl.conf
+
+cat << EOF > /etc/systemd/system/disable-thp.service
+[Unit]
+Description=Disable Transparent Huge Pages (THP)
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c "echo 'never' > /sys/kernel/mm/transparent_hugepage/enabled && echo 'never' > /sys/kernel/mm/transparent_hugepage/defrag"
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload ;\
+systemctl start disable-thp ;\
+systemctl enable disable-thp ;\
+systemctl restart redis-server
+
+# 3.3.2. Actualizacion de NVTs
+Las NVTs actualizadas a traves del Greenbone Community Feed se hacen por rsync. Como medida de seguridad se plantea la siguiente estructura de sincronizacion, para proteger el servidor GVM:
+
+        Internet---GCF
+	   |
+    (TCP 80,443,873)
+	   |
+	  ISP------DMZ [ispmirror]
+           |
+      (TCP 80,443)
+	   |        
+        Firewall---DMZ [mirror]
+           |
+        Firewall---GI [gvm]
+           |
+          LAN
+
+En este caso el proveedor de servicios de internet solo permitia la salida por el puerto TCP 80 y 443. Esto nos impedia de que nuestro servidor mirror pudiera hacer rsync directo al GCF. Se propuso que un servidor mirror del ISP pudiera acceder via TCP 873 (rsync) al GCF y nuestro servidor mirror poder bajar los feeds de este, mediante lftp. Una vez en nuestro servidor mirror, ya es cosa nuestra permitir el rsync, para que el gvm-server pueda bajar las actualizaciones, como si lo estuviese haciendo directo del GCF.
+
+[gvm]--(via rsync)-->[mirror]--(via lftp)-->[ispmirror]-->(via rsync)--[GCF]
+          02:00                  03:00                       04:00
+
+### Configuraciones necesarias en servidor "ispmirror"
+mkdir -p /mnt/data/h5ai/gvm/feed-mirror/nvt-feed
+mkdir -p /mnt/data/h5ai/gvm/feed-mirror/data-objects/gvmd
+mkdir /mnt/data/h5ai/gvm/feed-mirror/scap-data
+mkdir /mnt/data/h5ai/gvm/feed-mirror/cert-data
+
+#=======================
+# NOTA:
+Se considera el directorio root "/mnt/data/h5ai/gvm/" para los feeds de GVM.
+#=======================
+
+Instalamos rsync
+apt install -y rsync
+
+Creamos el siguiente script:
+mkdir -p /config/scripts/
+cat << EOF > /config/scripts/greenbone-feed-sync-local.sh
+#!/bin/bash
+#
+# greenbone-feed-sync-local.sh
+#
+# Este script actualiza un mirror local de GVM de Greenbone Community Feeds
+#
+# Lukas Grunwald <lukas.grunwald@greenbone.net>
+# Jan-Oliver Wagner <jan-oliver.wagner@greenbone.net>
+# Michael Wiegand <michael.wiegand@greenbone.net>
+# Anssi Ylätalo <anssi.ylatalo@kymp.net>
+# Editado por: Franco Diiaz Hurtado <francodiazhurtado@gmail.com>
+
+## Directorios del mirror
+## Adaptar seguun sus necesidades
+BASE_DIR=/mnt/data/h5ai/repos/gvm/feed-mirror
+NVT_DIR=$BASE_DIR/nvt-feed
+GVMD_DATA_DIR=$BASE_DIR/data-objects
+SCAP_DIR=$BASE_DIR/scap-data
+CERT_DIR=$BASE_DIR/cert-data
+
+## No editar las siguientes liineas
+PRIVATE_SUBDIR="private"
+RSYNC_DELETE_NVT="--delete --exclude $PRIVATE_SUBDIR/"
+RSYNC_DELETE_GVMD_DATA="--delete --exclude $PRIVATE_SUBDIR/"
+RSYNC_DELETE_SCAP="--delete --exclude scap.db --exclude \"$PRIVATE_SUBDIR/\""
+RSYNC_DELETE_CERT="--delete --exclude cert.db --exclude \"$PRIVATE_SUBDIR/\""
+
+COMMUNITY_NVT_RSYNC_FEED="rsync://feed.community.greenbone.net:/nvt-feed"
+COMMUNITY_GVMD_DATA_RSYNC_FEED="rsync://feed.community.greenbone.net:/data-objects/gvmd"
+COMMUNITY_SCAP_RSYNC_FEED="rsync://feed.community.greenbone.net:/scap-data"
+COMMUNITY_CERT_RSYNC_FEED="rsync://feed.community.greenbone.net:/cert-data"
+
+ERROR=0
+
+echo "#========================================================="
+echo "INFO: Greenbone Community Feed sync para repositorio local"
+echo "#========================================================="
+date
+echo "#==========================="
+echo "INFO: Sincronizando NVT feed"
+echo "#==========================="
+if rsync -ltvrP $RSYNC_DELETE_NVT "$COMMUNITY_NVT_RSYNC_FEED" "$NVT_DIR";
+  then
+    echo "INFO: NVT feed sincronizado satisfactoriamente"
+  else
+    echo "ERROR: No se pudo sincronizar NVT feed"
+    ERROR=1
+fi
+
+echo "#================================="
+echo "INFO: Sincronizando GVMD_DATA feed"
+echo "#================================="
+date
+if rsync -ltvrP $RSYNC_DELETE_GVMD_DATA "$COMMUNITY_GVMD_DATA_RSYNC_FEED" "$GVMD_DATA_DIR";
+  then
+    echo "INFO: GVMD_DATA feed sincronizado satisfactoriamente"
+  else
+    echo "ERROR: No se pudo sincronizar GVMD_DATA feed"
+    ERROR=1
+fi
+
+echo "#============================"
+echo "INFO: Sincronizando SCAP feed"
+echo "#============================"
+date
+if rsync -ltvrP $RSYNC_DELETE_SCAP "$COMMUNITY_SCAP_RSYNC_FEED" "$SCAP_DIR";
+  then
+    echo "INFO: SCAP feed sincronizado satisfactoriamente"
+  else
+    echo "ERROR: No se pudo sincronizar SCAP feed"
+    ERROR=1
+fi
+
+echo "#============================"
+echo "INFO: Sincronizando CERT feed"
+echo "#============================"
+date
+if rsync -ltvrP $RSYNC_DELETE_CERT "$COMMUNITY_CERT_RSYNC_FEED" "$CERT_DIR";
+  then
+    echo "INFO: CERT feed sincronizado satisfactoriamente"
+  else
+    echo "ERROR: No se pudo sincronizar CERT feed"
+    ERROR=1
+fi
+
+date
+if [[ $ERROR -lt 1 ]]; 
+  then
+    echo "INFO: Todos los feeds sincronizados satisfactoriamente"
+    exit 0
+else
+  echo "WARNING: Algunos feeds no se sincronizado satisfactoriamente"
+  exit 1
+fi
+EOF
+
+Damos permisos de ejecucion:
+chmod +x /config/scripts/greenbone-feed-sync-local.sh
+crontab -e
+# [...]
+0 4 * * * /config/scripts/greenbone-feed-sync-local.sh
+
+### Configuraciones necesarias en servidor "mirror"
+Instalamos lfpt:
+apt install -y lftp
+
+Creamos el directorio de logs para lftp:
+mkdir /var/log/lftp/
+
+Creamos el script de sincronizacion con el "ispmirror":
+nano /config/scripts/lftpmirror-gvm.sh
+Agregamos lo siguiente:
+###################
+## Definir Rutas
+FEED_DIR="/mnt/data/h5ai/repos/gvm/feed-mirror/"
+SERVER="http://linux.hav.avianet.cu/repos/gvm/openvas/feed-mirror/"
+
+## Opciones de lftp
+OPCIONES="-c 10 --exclude="ess" --exclude="eav" --log=/var/log/lftp/gvm-feed-mirror.log"
+
+## Empezar la sincronizacion
+lftp -c mirror $SERVER $FEED_DIR $OPCIONES
+cat << EOF > "$UPDATE/info.txt"
+## GVM mirror-script by Franco Diaz Hurtado
+#================================
+Nombre: Actualizacion de los feeds de GVM
+Desde: $SERVER
+Fecha: $(date +'%d-%m-%Y')
+Hora: $(date +'%R')
+#================================
+Departamento de Redes
+EOF
+exit 0
+###################
+
+Instalamos rsync:
+apt install -y rsync
+
+Configuramos rsync para distribuir los directorios del feed-mirror de gvm
+cat << EOF > /etc/rsyncd.conf
+log file = /var/log/rsyncd.log
+
+# Local OpenVAS NVT feed
+[nvt-feed]
+  path = /mnt/data/h5ai/repos/gvm/feed-mirror/nvt-feed
+  read only = true
+  hosts allow = *
+  hosts deny =
+  uid = root
+  gid = root
+
+# Local OpenVAS GVMD_DATA feed
+[data-objects]
+  path = /mnt/data/h5ai/repos/gvm/feed-mirror/data-objects/gvmd
+  read only = true
+  hosts allow = *
+  hosts deny =
+  uid = root
+  gid = root
+
+# Local OpenVAS SCAP feed
+[scap-data]
+  path = /mnt/data/h5ai/repos/gvm/feed-mirror/scap-data
+  read only = true
+  hosts allow = *
+  hosts deny =
+  uid = root
+  gid = root
+
+# Local OpenVAS CERT feed
+[cert-data]
+  path = /mnt/data/h5ai/repos/gvm/feed-mirror/cert-data
+  read only = true
+  hosts allow = *
+  hosts deny =
+  uid = root
+  gid = root
+EOF
+
+Reiniciamos el servicio:
+systemctl restart rsync.service
+
+### Configuraciones necesarias en servidor "gvm"
+Cambiamos al usuario "gvm":
+su - gvm
+
+Configuramos GVM para que sincronice los feeds de nuestro servidor mirror local. Editamos el siguiente fichero:
+nano /opt/gvm/bin/greenbone-nvt-sync
+Buscamos la linea 'COMMUNITY_NVT_RSYNC_FEED=rsync://feed.community.greenbone.net:/nvt-feed' y la modificamos por la siguiente:
+COMMUNITY_NVT_RSYNC_FEED="rsync://download.ecasa.avianet.cu:/nvt-feed"
+
+Guardamos los cambios.
+
+Actualizamos las NVTs como usuario de openvas:
+greenbone-nvt-sync
+
+El comando anterior descarga los nvt-feed en el directorio "/opt/gvm/var/lib/openvas/plugins/"
+
+Actualizamos el servidor de Redis con la misma informacion de VT desde los ficheros VT
+openvas --update-vt-info
+
+# 3.4. Instalacion de GVM
+cd /opt/gvm/gvm-source/gvmd/ ;\
+export PKG_CONFIG_PATH=/opt/gvm/lib/pkgconfig:$PKG_CONFIG_PATH ;\
+mkdir build && cd build ;\
+cmake -DCMAKE_INSTALL_PREFIX=/opt/gvm .. ;\
+make && make install ;\
+cd ../../
+
+Creamos el usuario "gvm" para PostgreSQL y la DB para GVMD
+exit
+sudo -Hiu postgres
+createuser gvm
+createdb -O gvm gvmd
+
+Otorgamos los roles para el usuario DBA de PostgreSQL
+psql gvmd
+create role dba with superuser noinherit;
+grant dba to gvm;
+create extension "uuid-ossp";
+create extension "pgcrypto";
+exit
+exit
+
+Reiniciamos PostgreSQL y habilitamos el script de autoinicio
+systemctl restart postgresql
+systemctl enable postgresql
+
+# 3.5. Instalacion de GSA
+su - gvm
+cd /opt/gvm/gvm-source/gsa/ ;\
+export PKG_CONFIG_PATH=/opt/gvm/lib/pkgconfig:$PKG_CONFIG_PATH ;\
+mkdir build && cd build ;\
+cmake -DCMAKE_INSTALL_PREFIX=/opt/gvm .. ;\
+make && make install ;\
+cd ../../
+
+# 3.6. Actualizacion periodica de los feeds de GVM
+Actualizamos el resto de los feeds, siendo la sincronizacion de SCAP primero que la de CERT, ya que el ultimo depende de los datos provistos por el primero.
+
+Antes deberemos editar el siguiente fichero:
+nano /opt/gvm/sbin/greenbone-feed-sync
+Buscamos la linea 'COMMUNITY_RSYNC_FEED="rsync://feed.community.greenbone.net:/cert-data"' y la modificamos por la siguiente:
+COMMUNITY_RSYNC_FEED="rsync://download.ecasa.avianet.cu:/cert-data"
+
+Buscamos la linea 'COMMUNITY_RSYNC_FEED="rsync://feed.community.greenbone.net:/scap-data"' y la modificamos por la siguiente:
+COMMUNITY_RSYNC_FEED="rsync://download.ecasa.avianet.cu:/scap-data"
+
+Buscamos la linea 'COMMUNITY_RSYNC_FEED="rsync://feed.community.greenbone.net:/data-objects/"' y la modificamos por la siguiente:
+COMMUNITY_RSYNC_FEED="rsync://download.ecasa.avianet.cu:/data-objects"
+
+Guardamos los cambios. Ahora si estamos listos para sincronizar los feeds restantes:
+greenbone-scapdata-sync
+
+#================
+NOTA:
+Corremos el comando anterior, hasta que logre descargar datos del servidor mirror.
+#================
+
+El comando anterior descarga los scap-data en el directorio "/opt/gvm/var/lib/gvm/scap-data"
+
+greenbone-certdata-sync
+
+#================
+NOTA:
+Corremos el comando anterior, hasta que logre descargar datos del servidor mirror.
+#================
+
+El comando anterior descarga los cert-data en el directorio "/opt/gvm/var/lib/gvm/cert-data"
+
+Generamos los certificados de gvmd:
+gvm-manage-certs -a
+
+greenbone-feed-sync --type GVMD_DATA
+
+#================
+NOTA:
+Corremos el comando anterior, hasta que logre descargar datos del servidor mirror.
+#================
+
+El comando anterior descarga los data-objects en el directorio "/opt/gvm/var/lib/gvm/data-objects/gvmd/"
+
+Cambiamos al usuario "root" y creamos las tareas programadas para la actualizacion de los feeds, diariamente:
+exit
+mkdir -p /config/scripts/ ;\
+cat << EOF > /config/scripts/greenbone-feed-sync.sh
+sudo -Hiu gvm greenbone-nvt-sync
+sudo -Hiu gvm greenbone-feed-sync --type GVMD_DATA
+sudo -Hiu gvm greenbone-scapdata-sync --type SCAP
+sudo -Hiu gvm greenbone-certdata-sync --type CERT
+sudo -Hiu gvm openvas --update-vt-info
+EOF
+
+chmod +x /config/scripts/greenbone-feed-sync.sh
+
+crontab -e
+0 2 * * * /config/scripts/greenbone-feed-sync.sh
+
+service cron restart
+
+# 3.7. Instalacion de OSPd y ospd-openvas
+su - gvm
+
+# Instalamos el virtualenv
+cd /opt/gvm/gvm-source ;\
+export PKG_CONFIG_PATH=/opt/gvm/lib/pkgconfig:$PKG_CONFIG_PATH ;\
+virtualenv --python python3.7  /opt/gvm/bin/ospd-scanner/ ;\
+source /opt/gvm/bin/ospd-scanner/bin/activate
+
+# Instalamos el ospd
+mkdir /opt/gvm/var/run/ospd/ ;\
+cd ospd/ ;\
+pip3 install . ;\
+cd ../
+
+# ospd-openvas
+cd ospd-openvas/ ;\
+pip3 install . ;\
+cd ../
+
+# 3.8. Configuracion de GVMD (gvmd), GSA (gsad) y OpenVAS Scanner (ospd-openvas), como servicios
+
+Para gestionar OpenVAS scanner, GSA y GVMd, creamos el fichero de servicio de systemd para cada uno.
+
+Cambiamos al usuario "root"
+exit
+
+# Servicio de OpenVAS:
+cat > /etc/systemd/system/ospd-openvas.service << 'EOL'
+[Unit]
+Description=Job that runs the ospd-openvas daemon
+Documentation=man:gvm
+After=network.target redis-server@openvas.service
+Wants=redis-server@openvas.service
+
+[Service]
+#ExecStartPre=-rm -rf /opt/gvm/var/run/ospd-openvas.pid /opt/gvm/var/run/ospd.sock /opt/gvm/var/run/gvmd.sock
+ExecStartPre=-rm -rf /opt/gvm/var/run/ospd-openvas.pid
+Type=forking
+User=gvm
+Group=gvm
+WorkingDirectory=/opt/gvm
+Environment=PATH=/opt/gvm/bin/ospd-scanner/bin:/opt/gvm/bin:/opt/gvm/sbin:/opt/gvm/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/gvm/bin:/opt/gvm/sbin:/opt/gvm/.local/bin
+#Environment=PYTHONPATH=/opt/gvm/lib/python3.7/site-packages
+ExecStart=/opt/gvm/bin/ospd-scanner/bin/python /opt/gvm/bin/ospd-scanner/bin/ospd-openvas \
+--pid-file /opt/gvm/var/run/ospd-openvas.pid \
+--log-file /opt/gvm/var/log/gvm/ospd-scanner.log \
+--lock-file-dir /opt/gvm/var/run/ospd/ \
+--unix-socket=/opt/gvm/var/run/ospd.sock
+#Restart=on-failure
+#RestartSec=2min
+KillMode=process
+KillSignal=SIGINT
+GuessMainPID=no
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+# Servicio de GSA:
+cat > /etc/systemd/system/gsad.service << 'EOL'
+[Unit]
+Description=Greenbone Security Assistant (gsad)
+Documentation=man:gsad(8) https://www.greenbone.net
+After=network.target
+Wants=gvmd.service
+
+[Service]
+Type=forking
+User=gvm
+Group=gvm
+PIDFile=/opt/gvm/var/run/gsad.pid
+WorkingDirectory=/opt/gvm
+#Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/gvm/bin:/opt/gvm/sbin:/opt/gvm/.local/bin
+#Environment=PYTHONPATH=/opt/gvm/lib/python3.7/site-packages
+ExecStart=/usr/bin/sudo /opt/gvm/sbin/gsad
+#Restart=on-failure
+#RestartSec=2min
+KillMode=process
+KillSignal=SIGINT
+GuessMainPID=no
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+# Servicio de GVM:
+cat > /etc/systemd/system/gvmd.service << 'EOL'
+[Unit]
+Description=Control the OpenVAS GVM service
+Documentation=man:gvmd(8) https://www.greenbone.net
+Wants=postgresql.service ospd-openvas.service
+After=postgresql.service ospd-openvas.service
+
+[Service]
+Type=forking
+User=gvm
+Group=gvm
+PIDFile=/opt/gvm/var/run/gvmd.pid
+WorkingDirectory=/opt/gvm
+#Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/gvm/bin:/opt/gvm/sbin:/opt/gvm/.local/bin
+#Environment=PYTHONPATH=/opt/gvm/lib/python3.7/site-packages
+ExecStart=/opt/gvm/sbin/gvmd --osp-vt-update=/opt/gvm/var/run/ospd.sock
+RemainAfterExit=yes
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+Restart=on-failure
+RestartSec=2min
+KillMode=process
+KillSignal=SIGINT
+GuessMainPID=no
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+Recargamos el sistema e iniciamos los servicios
+systemctl daemon-reload ;\
+systemctl daemon-reload ;\
+systemctl enable gvmd ;\
+systemctl enable gsad ;\
+systemctl enable ospd-openvas ;\
+systemctl start gvmd ;\
+systemctl start gsad ;\
+systemctl start ospd-openvas
+
+# 3.9. Creacion del escaner GVM
+Desde que lanzamos el escaner y lo establecimos para ser usado por nuestra ruta de escaner no-estandar ("/opt/gvm/var/run/ospd.sock"), necesitamos crear y registrar nuestro escaner:
+su - gvm
+gvmd --create-scanner="My GVM OpenVAS Scanner" --scanner-type="OpenVAS" --scanner-host=/opt/gvm/var/run/ospd.sock
+
+Debe devolver lo siguiente:
+###########
+Scanner created.
+###########
+
+Lo siguiente sera verificar el escaner. Para ello debemos obtener el ID del mismo:
+gvmd --get-scanners
+
+Debe devolvernos, algo como lo siguiente:
+###########
+08b69003-5fc2-4037-a479-93b440211c73  OpenVAS  /var/run/ospd/ospd.sock  0  OpenVAS Default
+6acd0832-df90-11e4-b9d5-28d24461215b  CVE    0  CVE
+78e7595d-6b83-4814-a4b2-c5196c1111c3  OpenVAS  /opt/gvm/var/run/ospd.sock  9390  My GVM OpenVAS Scanner
+###########
+
+Basado en la salida de arriba, nuestro escaner tiene como ID "78e7595d-6b83-4814-a4b2-c5196c1111c3"
+
+Verificamos el escaner:
+gvmd --verify-scanner=78e7595d-6b83-4814-a4b2-c5196c1111c3
+
+Debe devolvernos lo siguiente:
+###########
+Scanner version: OpenVAS 21.4.0.
+###########
+
+# 3.10. Creacion del usuario de administracion de GVM
+Creamos el usuario administrativo de OpenVAS mediante el siguiente comando:
+gvmd --create-user admin --password=yourpassword
+
+Debe devolvernos lo siguiente:
+###########
+User created
+###########
+
+#================
+NOTA:
+Si deseamos modificar la contraseña del usuario, correr lo siguiente:
+gvmd --user=<USERNAME> --new-password=<PASSWORD>
+#================
+
+El usuario administrativo podra crear otros usuarios mediante otras vias, como el propio cliente web, GSA.
+
+# 3.11. Propietario de los feeds importados
+gvmd solamente creara algunos recursos si "Feed Import Owner" es configurado. Lo primero sera listar todos los UUIDs de los usuarios creados (en este caso, "admin" es el unico usuario creado):
+gvmd --get-users --verbose
+Debe devolver algo, como esto:
+############
+admin 31483586-23ae-40c3-9250-89cb7e3dd33a
+############
+Luego, modificamos las opciones de gvmd con el UUID del usuario:
+gvmd --modify-setting 78eceaec-3385-11ea-b237-28d24461215b --value 31483586-23ae-40c3-9250-89cb7e3dd33a
+
+#================
+NOTA:
+Corremos el comando anterior, hasta que logre descargar datos del servidor mirror.
+#================
+
+Ejcutamos el script de sincronizacion con las bases:
+exit
+/config/scripts/greenbone-feed-sync.sh
+
+Reiniciamos el servidor:
+reboot
+
+Al iniciar el servidor, podremos acceder via web al GSA, mediante el siguiente enlace:
+https://gsa.ecasa.avianet.cu
+
+### Agregar un escaneo a un destino
+Configuration > Targets
+En la esquina superior izquierda, click en el icono "7"
+Una vez modificados los campos necesarios, salvamos la configuracion y quedara creado el "target".
+
+Despues de creado se visualizara en la seccion de "targets":
+
+Ahora que el "target" fue agregado, necesitamos crear la tarea de escaneo. navegamos hasta "Scans > Tasks"
+
+Nos situamos encima del icono "7" y seleccionamos la opcion "New Task":
+
+Le ponemos un nombre y un comentario al scan y podemos dejar las configuraciones por defecto:
+
+A continuacion se muestra el scan creado:
+
+Para correr el scan contra un "target", damos un click en el icono "13"
+
+Una vez que el scan inicia, esperamos por los resultados. Esto puede tomar un tiempo, dependiendo del tipo de scan seleccionado.
+
+En la vista "Dashboards" podremos ver que se encuentra corriendo la tarea:
+
+
+
+
