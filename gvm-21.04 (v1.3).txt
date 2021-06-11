@@ -11,7 +11,7 @@ gvmd controla una base de datos PostgreSQL, donde todas las configuraciones y re
 
 **Greenbone Security Assistant (GSA)
 
-GSA es la interface web de GVM con la que el usuario contra los escaneos y los accesos a las vulnerabilidades de la information. Es el punto de contacto principal para el usuario con el GVM. Se conecta al gvmd a travÈs del servidor web Greenbone Security Assistant Daemon (gsad) para proveer una aplicacion web completa para la administracion de vulnerabilidades.
+GSA es la interface web de GVM con la que el usuario contra los escaneos y los accesos a las vulnerabilidades de la information. Es el punto de contacto principal para el usuario con el GVM. Se conecta al gvmd a trav√©s del servidor web Greenbone Security Assistant Daemon (gsad) para proveer una aplicacion web completa para la administracion de vulnerabilidades.
 
 **Escaner OpenVAS
 
@@ -120,21 +120,6 @@ Se requieren diferentes herramientas para instalar GVM. Ellas son:
 
 #Como estaremos corriendo GVM como un usuario no privilegiado, "gvm", entonces instalaremos los #ficheros de configuracion y librerias debajo del directorio "/opt/gvm/".
 
-#Actualizamos la ruta de las variables de entorno en "/etc/enviroment/", para incluir la ruta del #binario de GVM:
-#nano /etc/environment
-##################
-#PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/o#pt/gvm/bin:/opt/gvm/sbin:/opt/gvm/.local/bin"
-##################
-
-#Agregamos la ruta de la libreria de GVM a "/etc/ld.so.conf.d":
-#echo "/opt/gvm/lib" > /etc/ld.so.conf.d/gvm.conf
-
-#Cambiamos al usuario "gvm":
-#su - gvm
-
-#Creamos un directorio temporal para almacenar los ficheros fuentes:
-#mkdir gvm-source/
-
 su - gvm
 mkdir gvm-source ;\
 cd gvm-source ;\
@@ -191,10 +176,60 @@ gvm     ALL = NOPASSWD: /opt/gvm/sbin/gsad
 
 export LC_ALL="C" ;\
 ldconfig ;\
-cp /etc/redis/redis.conf /etc/redis/redis.orig ;\
-cp /opt/gvm/gvm-source/openvas/config/redis-openvas.conf /etc/redis/ ;\
-chown redis:redis /etc/redis/redis-openvas.conf ;\
+mv /etc/redis/redis.conf /etc/redis/redis.orig ;\
+cp /opt/gvm/gvm-source/openvas/config/redis-openvas.conf /etc/redis/redis.conf ;\
+chown redis:redis /etc/redis/redis.conf ;\
 echo "db_address = /run/redis-openvas/redis.sock" > /opt/gvm/etc/openvas/openvas.conf ;\
+
+cat << EOF > /etc/systemd/system/redis.service
+[Unit]
+Description=Advanced key-value store
+After=network.target
+Documentation=http://redis.io/documentation, man:redis-server(1)
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/redis-server /etc/redis/redis.conf
+ExecStop=/bin/kill -s TERM $MAINPID
+PIDFile=/run/redis-openvas/redis-server.pid
+TimeoutStopSec=0
+Restart=always
+User=redis
+Group=redis
+RuntimeDirectory=redis
+RuntimeDirectoryMode=2755
+
+UMask=007
+PrivateTmp=yes
+LimitNOFILE=65535
+PrivateDevices=yes
+ProtectHome=yes
+ReadOnlyDirectories=/
+ReadWriteDirectories=-/var/lib/redis
+ReadWriteDirectories=-/var/log/redis
+ReadWriteDirectories=-/var/run/redis-openvas
+
+NoNewPrivileges=true
+CapabilityBoundingSet=CAP_SETGID CAP_SETUID CAP_SYS_RESOURCE
+MemoryDenyWriteExecute=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictNamespaces=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+# redis-server can write to its own config file when in cluster mode so we
+# permit writing there by default. If you are not using this feature, it is
+# recommended that you replace the following lines with "ProtectSystem=full".
+ProtectSystem=true
+ReadWriteDirectories=-/etc/redis
+
+[Install]
+WantedBy=multi-user.target
+Alias=redis.service
+EOF
+
 systemctl enable redis-server@openvas.service ;\
 systemctl start redis-server@openvas.service
 
@@ -269,7 +304,7 @@ cat << EOF > /config/scripts/greenbone-feed-sync-local.sh
 # Lukas Grunwald <lukas.grunwald@greenbone.net>
 # Jan-Oliver Wagner <jan-oliver.wagner@greenbone.net>
 # Michael Wiegand <michael.wiegand@greenbone.net>
-# Anssi Yl‰talo <anssi.ylatalo@kymp.net>
+# Anssi Yl√§talo <anssi.ylatalo@kymp.net>
 # Editado por: Franco Diiaz Hurtado <francodiazhurtado@gmail.com>
 
 ## Directorios del mirror
@@ -731,7 +766,7 @@ User created
 
 #================
 NOTA:
-Si deseamos modificar la contraseÒa del usuario, correr lo siguiente:
+Si deseamos modificar la contrase√±a del usuario, correr lo siguiente:
 gvmd --user=<USERNAME> --new-password=<PASSWORD>
 #================
 
@@ -759,7 +794,9 @@ exit
 Reiniciamos el servidor:
 reboot
 
-Al iniciar el servidor, podremos acceder via web al GSA, mediante el siguiente enlace:
+GVM podra tardar entre 15min y 1h, dependiendo de los recursos hardware del servidor, en reconocer los cambios efectuados, tras actualizar los feeds y se vean reflejados en el GSA.
+
+Acceder via web al GSA, mediante el siguiente enlace:
 https://gsa.ecasa.avianet.cu
 
 ### Agregar un escaneo a un destino
@@ -782,7 +819,3 @@ Para correr el scan contra un "target", damos un click en el icono "13"
 Una vez que el scan inicia, esperamos por los resultados. Esto puede tomar un tiempo, dependiendo del tipo de scan seleccionado.
 
 En la vista "Dashboards" podremos ver que se encuentra corriendo la tarea:
-
-
-
-
