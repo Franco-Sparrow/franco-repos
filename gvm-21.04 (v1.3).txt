@@ -37,16 +37,67 @@ Espacio en disco para "/var": 30 GB
 #==============
 
 # 1. Prerequisitos
+
+Cambiar la configuracion de idioma del sistema. primero verificamos los idiomas que tenemos:
+locale
+Debe devolvernos, algo como lo siguiente:
+################
+LANG=es_CU
+LANGUAGE=es_CU:es
+LC_CTYPE="es_CU"
+LC_NUMERIC="es_CU"
+LC_TIME="es_CU"
+LC_COLLATE="es_CU"
+LC_MONETARY="es_CU"
+LC_MESSAGES="es_CU"
+LC_PAPER="es_CU"
+LC_NAME="es_CU"
+LC_ADDRESS="es_CU"
+LC_TELEPHONE="es_CU"
+LC_MEASUREMENT="es_CU"
+LC_IDENTIFICATION="es_CU"
+LC_ALL=
+################
+
+Reconfiguramos el idioma:
+dpkg-reconfigure locales
+
+Nos deslogueamos:
+exit
+
+Nos volvemos a loguear y verificamos si cambio el idioma:
+locale
+
+Debe devolvernos, algo como lo siguiente:
+################
+LANG=en_US.UTF-8
+LANGUAGE=
+LC_CTYPE="en_US.UTF-8"
+LC_NUMERIC="en_US.UTF-8"
+LC_TIME="en_US.UTF-8"
+LC_COLLATE="en_US.UTF-8"
+LC_MONETARY="en_US.UTF-8"
+LC_MESSAGES="en_US.UTF-8"
+LC_PAPER="en_US.UTF-8"
+LC_NAME="en_US.UTF-8"
+LC_ADDRESS="en_US.UTF-8"
+LC_TELEPHONE="en_US.UTF-8"
+LC_MEASUREMENT="en_US.UTF-8"
+LC_IDENTIFICATION="en_US.UTF-8"
+LC_ALL=
+################
+
+Seleccionamos el idioma "en_US.UTF-8 UTF-8"
+#locale-gen en_US.UTF-8 ;\
+#export LC_ALL="C"
+locale-gen en_US.UTF-8 ;\
+export LC_ALL="en_US.UTF-8"
+
 Actualizacion del sistema
 apt update && apt -y upgrade
 
-dpkg-reconfigure locales
-Seleccionamos el idioma "en_US.UTF-8 UTF-8"
-locale-gen en_US.UTF-8 ;\
-export LC_ALL="C"
-
 Instalacion de herramientas y dependencias necesarias
-apt install -y sudo git rsync cmake gnutls-bin cmake pkg-config \
+apt install -y build-essential sudo git rsync cmake gnutls-bin cmake pkg-config \
 libglib2.0-dev \
 libgpgme-dev \
 libgnutls28-dev \
@@ -97,7 +148,7 @@ echo 'export PATH="$PATH:/opt/gvm/bin:/opt/gvm/sbin:/opt/gvm/.local/bin"' | sudo
 sudo chmod 0755 /etc/profile.d/gvm.sh ;\
 source /etc/profile.d/gvm.sh ;\
 sudo bash -c 'cat << EOF > /etc/ld.so.conf.d/gvm.conf
-# gmv libs location
+# gmv-libs location
 /opt/gvm/lib
 EOF'
 
@@ -126,12 +177,12 @@ cd gvm-source ;\
 export PKG_CONFIG_PATH=/opt/gvm/lib/pkgconfig:$PKG_CONFIG_PATH
 
 Descargamos los paquetes comprimidos oficiales de las fuentes de GVM en Github:
-wget --no-verbose https://github.com/greenbone/gvm-libs/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv gvm-libs-21.4.0 gvm-libs
-wget --no-verbose https://github.com/greenbone/openvas-smb/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv openvas-smb-21.4.0 openvas-smb
-wget --no-verbose https://github.com/greenbone/openvas-scanner/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv openvas-scanner-21.4.0 openvas
-wget --no-verbose https://github.com/greenbone/ospd/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv ospd-21.4.0 ospd
-wget --no-verbose https://github.com/greenbone/ospd-openvas/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv ospd-openvas-21.4.0 ospd-openvas
-wget --no-verbose https://github.com/greenbone/gvmd/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv gvmd-21.4.0 gvmd
+wget --no-verbose https://github.com/greenbone/gvm-libs/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv gvm-libs-21.4.0 gvm-libs ;\
+wget --no-verbose https://github.com/greenbone/openvas-smb/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv openvas-smb-21.4.0 openvas-smb ;\
+wget --no-verbose https://github.com/greenbone/openvas-scanner/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv openvas-scanner-21.4.0 openvas ;\
+wget --no-verbose https://github.com/greenbone/ospd/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv ospd-21.4.0 ospd ;\
+wget --no-verbose https://github.com/greenbone/ospd-openvas/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv ospd-openvas-21.4.0 ospd-openvas ;\
+wget --no-verbose https://github.com/greenbone/gvmd/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv gvmd-21.4.0 gvmd ;\
 wget --no-verbose  https://github.com/greenbone/gsa/archive/refs/tags/v21.4.0.tar.gz && tar -zxf v21.4.0.tar.gz && rm v21.4.0.tar.gz && mv gsa-21.4.0 gsa
 
 # 3.1. Instalar GVM 11 Libraries
@@ -174,13 +225,14 @@ gvm     ALL = NOPASSWD: /opt/gvm/sbin/openvas
 gvm     ALL = NOPASSWD: /opt/gvm/sbin/gsad
 ########
 
-export LC_ALL="C" ;\
+#export LC_ALL="C" ;\
 ldconfig ;\
 mv /etc/redis/redis.conf /etc/redis/redis.orig ;\
-cp /opt/gvm/gvm-source/openvas/config/redis-openvas.conf /etc/redis/redis.conf ;\
-chown redis:redis /etc/redis/redis.conf ;\
+cp /opt/gvm/gvm-source/openvas/config/redis-openvas.conf /etc/redis/redis-openvas.conf ;\
+chown redis:redis /etc/redis/redis-openvas.conf ;\
 echo "db_address = /run/redis-openvas/redis.sock" > /opt/gvm/etc/openvas/openvas.conf ;\
-
+mkdir /run/redis-openvas/ ;\
+chown redis:redis /run/redis-openvas/ ;\
 cat << EOF > /etc/systemd/system/redis.service
 [Unit]
 Description=Advanced key-value store
@@ -189,7 +241,7 @@ Documentation=http://redis.io/documentation, man:redis-server(1)
 
 [Service]
 Type=forking
-ExecStart=/usr/bin/redis-server /etc/redis/redis.conf
+ExecStart=/usr/bin/redis-server /etc/redis/redis-openvas.conf
 ExecStop=/bin/kill -s TERM $MAINPID
 PIDFile=/run/redis-openvas/redis-server.pid
 TimeoutStopSec=0
@@ -230,6 +282,7 @@ WantedBy=multi-user.target
 Alias=redis.service
 EOF
 
+systemctl daemon-reload ;\
 systemctl enable redis-server@openvas.service ;\
 systemctl start redis-server@openvas.service
 
@@ -256,6 +309,9 @@ systemctl start disable-thp ;\
 systemctl enable disable-thp ;\
 systemctl restart redis-server
 
+Recomendamos reinicar el servidor:
+reboot
+
 # 3.3.2. Actualizacion de NVTs
 Las NVTs actualizadas a traves del Greenbone Community Feed se hacen por rsync. Como medida de seguridad se plantea la siguiente estructura de sincronizacion, para proteger el servidor GVM:
 
@@ -279,6 +335,10 @@ En este caso el proveedor de servicios de internet solo permitia la salida por e
           02:00                  03:00                       04:00
 
 ### Configuraciones necesarias en servidor "ispmirror"
+#====================
+# SERVIDOR ISPMIRROR
+#====================
+
 mkdir -p /mnt/data/h5ai/gvm/feed-mirror/nvt-feed
 mkdir -p /mnt/data/h5ai/gvm/feed-mirror/data-objects/gvmd
 mkdir /mnt/data/h5ai/gvm/feed-mirror/scap-data
@@ -398,6 +458,10 @@ crontab -e
 0 4 * * * /config/scripts/greenbone-feed-sync-local.sh
 
 ### Configuraciones necesarias en servidor "mirror"
+#=================
+# SERVIDOR MIRROR
+#=================
+
 Instalamos lfpt:
 apt install -y lftp
 
@@ -478,6 +542,10 @@ Reiniciamos el servicio:
 systemctl restart rsync.service
 
 ### Configuraciones necesarias en servidor "gvm"
+#==============
+# SERVIDOR GVM
+#==============
+
 Cambiamos al usuario "gvm":
 su - gvm
 
@@ -520,7 +588,7 @@ exit
 exit
 
 Reiniciamos PostgreSQL y habilitamos el script de autoinicio
-systemctl restart postgresql
+systemctl restart postgresql ;\
 systemctl enable postgresql
 
 # 3.5. Instalacion de GSA
@@ -543,7 +611,7 @@ COMMUNITY_RSYNC_FEED="rsync://download.ecasa.avianet.cu:/cert-data"
 Buscamos la linea 'COMMUNITY_RSYNC_FEED="rsync://feed.community.greenbone.net:/scap-data"' y la modificamos por la siguiente:
 COMMUNITY_RSYNC_FEED="rsync://download.ecasa.avianet.cu:/scap-data"
 
-Buscamos la linea 'COMMUNITY_RSYNC_FEED="rsync://feed.community.greenbone.net:/data-objects/"' y la modificamos por la siguiente:
+Buscamos la linea 'COMMUNITY_RSYNC_FEED="rsync://feed.community.greenbone.net:/data-objects/gvmd/"' y la modificamos por la siguiente:
 COMMUNITY_RSYNC_FEED="rsync://download.ecasa.avianet.cu:/data-objects"
 
 Guardamos los cambios. Ahora si estamos listos para sincronizar los feeds restantes:
@@ -645,8 +713,8 @@ ExecStart=/opt/gvm/bin/ospd-scanner/bin/python /opt/gvm/bin/ospd-scanner/bin/osp
 --log-file /opt/gvm/var/log/gvm/ospd-scanner.log \
 --lock-file-dir /opt/gvm/var/run/ospd/ \
 --unix-socket=/opt/gvm/var/run/ospd.sock
-#Restart=on-failure
-#RestartSec=2min
+Restart=on-failure
+RestartSec=2min
 KillMode=process
 KillSignal=SIGINT
 GuessMainPID=no
@@ -673,8 +741,8 @@ WorkingDirectory=/opt/gvm
 #Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/gvm/bin:/opt/gvm/sbin:/opt/gvm/.local/bin
 #Environment=PYTHONPATH=/opt/gvm/lib/python3.7/site-packages
 ExecStart=/usr/bin/sudo /opt/gvm/sbin/gsad
-#Restart=on-failure
-#RestartSec=2min
+Restart=on-failure
+RestartSec=2min
 KillMode=process
 KillSignal=SIGINT
 GuessMainPID=no
@@ -742,13 +810,13 @@ Debe devolvernos, algo como lo siguiente:
 ###########
 08b69003-5fc2-4037-a479-93b440211c73  OpenVAS  /var/run/ospd/ospd.sock  0  OpenVAS Default
 6acd0832-df90-11e4-b9d5-28d24461215b  CVE    0  CVE
-78e7595d-6b83-4814-a4b2-c5196c1111c3  OpenVAS  /opt/gvm/var/run/ospd.sock  9390  My GVM OpenVAS Scanner
+7973bbc8-645a-4f0d-9b3f-e07e2263239e  OpenVAS  /opt/gvm/var/run/ospd.sock  9390  My GVM OpenVAS Scanner
 ###########
 
-Basado en la salida de arriba, nuestro escaner tiene como ID "78e7595d-6b83-4814-a4b2-c5196c1111c3"
+Basado en la salida de arriba, nuestro escaner tiene como ID "7973bbc8-645a-4f0d-9b3f-e07e2263239e"
 
 Verificamos el escaner:
-gvmd --verify-scanner=78e7595d-6b83-4814-a4b2-c5196c1111c3
+gvmd --verify-scanner=7973bbc8-645a-4f0d-9b3f-e07e2263239e
 
 Debe devolvernos lo siguiente:
 ###########
@@ -777,15 +845,10 @@ gvmd solamente creara algunos recursos si "Feed Import Owner" es configurado. Lo
 gvmd --get-users --verbose
 Debe devolver algo, como esto:
 ############
-admin 31483586-23ae-40c3-9250-89cb7e3dd33a
+admin f3099d12-a809-4bb7-8c66-7c422b0e841c
 ############
 Luego, modificamos las opciones de gvmd con el UUID del usuario:
-gvmd --modify-setting 78eceaec-3385-11ea-b237-28d24461215b --value 31483586-23ae-40c3-9250-89cb7e3dd33a
-
-#================
-NOTA:
-Corremos el comando anterior, hasta que logre descargar datos del servidor mirror.
-#================
+gvmd --modify-setting 78eceaec-3385-11ea-b237-28d24461215b --value f3099d12-a809-4bb7-8c66-7c422b0e841c
 
 Ejcutamos el script de sincronizacion con las bases:
 exit
@@ -794,10 +857,19 @@ exit
 Reiniciamos el servidor:
 reboot
 
-GVM podra tardar entre 15min y 1h, dependiendo de los recursos hardware del servidor, en reconocer los cambios efectuados, tras actualizar los feeds y se vean reflejados en el GSA.
-
 Acceder via web al GSA, mediante el siguiente enlace:
-https://gsa.ecasa.avianet.cu
+https://ip-servidor
+
+#===========================
+NOTA:
+GVM podra tardar entre 15min y 1h, dependiendo de los recursos hardware del servidor, en reconocer los cambios efectuados, tras actualizar los feeds y se vean reflejados en el GSA. Si aun pasado este tiempo, no se reconocen los feeds, volvemos a sincronizarlos manualmente.
+su - gvm
+greenbone-nvt-sync
+greenbone-feed-sync --type SCAP
+greenbone-feed-sync --type CERT
+greenbone-feed-sync --type GVMD_DATA
+openvas --update-vt-info
+#===========================
 
 ### Agregar un escaneo a un destino
 Configuration > Targets
@@ -819,3 +891,7 @@ Para correr el scan contra un "target", damos un click en el icono "13"
 Una vez que el scan inicia, esperamos por los resultados. Esto puede tomar un tiempo, dependiendo del tipo de scan seleccionado.
 
 En la vista "Dashboards" podremos ver que se encuentra corriendo la tarea:
+
+
+
+
