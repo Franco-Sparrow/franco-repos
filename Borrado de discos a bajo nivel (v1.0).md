@@ -41,25 +41,25 @@ root@server:~# dd if=/dev/zero of=/dev/sdc bs=4096 status=progress
 
 Desplazarse hacia el panel2 y comenzar el borrado del dispositivo de disco `/dev/sdd`, utilizando el valor del tamaño de bloque obtenido para dicho disco:
 ```bash
-CtrlB
-Arriba
+Ctrl+B
+FlechaArriba
 root@server:~# dd if=/dev/zero of=/dev/sdd bs=4096 status=progress
 ```
 
 Desplazarse hacia el panel1 y comenzar el borrado del dispositivo de disco `/dev/sde`, utilizando el valor del tamaño de bloque obtenido para dicho disco::
 ```bash
-CtrlB
-Arriba
+Ctrl+B
+FlechaArriba
 root@server:~# dd if=/dev/zero of=/dev/sde bs=4096 status=progress
 ```
 
 Cuando termine de llenar los discos de ceros (borrar los discos), salir de la sesion tmux, ejecutando lo siguiente en cada panel:
 ```bash
-CtrlX
+Ctrl+X
 y
-CtrlX
+Ctrl+X
 y
-CtrlX
+Ctrl+X
 y
 ```
 
