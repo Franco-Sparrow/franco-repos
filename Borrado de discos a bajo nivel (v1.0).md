@@ -9,6 +9,22 @@ Suponiendo que los tres discos nuevos insertados en el servidor son reconocidos 
 - `/dev/sdd`
 - `/dev/sde`
 
+# Verificacion del estado de los discos
+
+Para asegurarse de que lo sdiscos no tienen ningun tipo de problemas, verificar los logs del `dmesg`, filtrando por los discos:
+```bash
+dmesg | grep sdc && \
+dmesg | grep sdd && \
+dmesg | grep sde
+```
+
+Verificar estado de los discos:
+```bash
+smartctl -a /dev/sdc && \
+smartctl -a /dev/sdd && \
+smartctl -a /dev/sde
+```
+
 Para estar seguros de que los discos estan completamente borrados, se debe eliminar cualquier rastro de metadatos o informacion o particion en el disco. Antes de hacer el `dd` se debe hayar el valor optimo para el tamaño de bloque `bs` (Por defecto, 512 Bytes):
 ```bash
 stat -c "%o" /dev/sdc && \
