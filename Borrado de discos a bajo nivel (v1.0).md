@@ -6,7 +6,7 @@
 
 Suponiendo que los tres discos nuevos insertados en el servidor son reconocidos como:
 - `/dev/sdc`
-- `/dev/sdc`
+- `/dev/sdd`
 - `/dev/sde`
 
 Para estar seguros de que los discos estan completamente borrados, se debe eliminar cualquier rastro de metadatos o informacion o particion en el disco. Antes de hacer el `dd` se debe hayar el valor optimo para el tamaño de bloque `bs` (Por defecto, 512 Bytes):
@@ -36,21 +36,21 @@ Crear varios paneles y comenzar el borrado del dispositivo de disco `/dev/sdc` e
 Ctrl+B
 SHIFT+"
 SHIFT+"
-root@server:~# dd if=/dev/zero of=/dev/sdb bs=4096 status=progress
+root@server:~# dd if=/dev/zero of=/dev/sdc bs=4096 status=progress
 ```
 
 Desplazarse hacia el panel2 y comenzar el borrado del dispositivo de disco `/dev/sdd`, utilizando el valor del tamaño de bloque obtenido para dicho disco:
 ```bash
 CtrlB
 Arriba
-root@server:~# dd if=/dev/zero of=/dev/sdc bs=4096 status=progress
+root@server:~# dd if=/dev/zero of=/dev/sdd bs=4096 status=progress
 ```
 
 Desplazarse hacia el panel1 y comenzar el borrado del dispositivo de disco `/dev/sde`, utilizando el valor del tamaño de bloque obtenido para dicho disco::
 ```bash
 CtrlB
 Arriba
-root@server:~# dd if=/dev/zero of=/dev/sdd bs=4096 status=progress
+root@server:~# dd if=/dev/zero of=/dev/sde bs=4096 status=progress
 ```
 
 Cuando termine de llenar los discos de ceros (borrar los discos), salir de la sesion tmux, ejecutando lo siguiente en cada panel:
