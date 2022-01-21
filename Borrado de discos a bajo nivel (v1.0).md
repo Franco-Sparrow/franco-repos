@@ -1,15 +1,14 @@
 # INDEX
 
-1. Borrado de los discos.
+1. Verificacion del estado de los discos.
+2. Borrado de los discos.
 
-# 1. Borrado de los discos
+# 1. Verificacion del estado de los discos
 
 Suponiendo que los tres discos nuevos insertados en el servidor son reconocidos como:
 - `/dev/sdc`
 - `/dev/sdd`
 - `/dev/sde`
-
-# Verificacion del estado de los discos
 
 Para asegurarse de que lo sdiscos no tienen ningun tipo de problemas, verificar los logs del `dmesg`, filtrando por los discos:
 ```bash
@@ -24,6 +23,8 @@ smartctl -a /dev/sdc && \
 smartctl -a /dev/sdd && \
 smartctl -a /dev/sde
 ```
+
+# 2. Borrado de los discos
 
 Para estar seguros de que los discos estan completamente borrados, se debe eliminar cualquier rastro de metadatos o informacion o particion en el disco. Antes de hacer el `dd` se debe hayar el valor optimo para el tamaño de bloque `bs` (Por defecto, 512 Bytes):
 ```bash
