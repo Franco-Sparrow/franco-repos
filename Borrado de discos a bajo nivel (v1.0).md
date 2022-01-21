@@ -31,7 +31,7 @@ root@server:~# apt install tmux -y && \
 tmux new -s dd
 ```
 
-Crear varios paneles y comenzar el borrado del dispositivo de disco `/dev/sdc` en el panel3, utilizando el valor del tamaño de bloque obtenido para dicho disco::
+Crear varios paneles y comenzar el borrado del dispositivo de disco `/dev/sdc` en el panel3, utilizando el valor del tamaño de bloque obtenido para dicho disco (en este caso, 4096):
 ```bash
 Ctrl+B
 SHIFT+"
