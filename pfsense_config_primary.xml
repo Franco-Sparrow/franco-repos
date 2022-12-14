@@ -823,7 +823,7 @@
                         <remote_networkv6></remote_networkv6>
                         <gwredir></gwredir>
                         <gwredir6></gwredir6>
-                        <local_network>172.17.34.0/24</local_network>
+                        <local_network>172.17.34.0/16</local_network>
                         <local_networkv6></local_networkv6>
                         <maxclients></maxclients>
                         <allow_compression>no</allow_compression>
@@ -1671,7 +1671,7 @@
                         <uniqid>6389466039020</uniqid>
                         <descr><![CDATA[LAN VIP CARP]]></descr>
                         <type>single</type>
-                        <subnet_bits>24</subnet_bits>
+                        <subnet_bits>16</subnet_bits>
                         <subnet>172.17.34.1</subnet>
                 </vip>
         </virtualip>
