@@ -5044,7 +5044,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "HyperCX-pfSense System Status",
+  "title": "HyperCX-pfSense System Metrics",
   "uid": "Kczn-jPZz",
   "version": 11,
   "weekStart": ""
