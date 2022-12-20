@@ -26,8 +26,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 12140,
   "graphTooltip": 1,
-  "id": 4,
-  "iteration": 1670606285765,
+  "iteration": 1671571246406,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -1164,8 +1163,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1417,16 +1415,17 @@
   "schemaVersion": 36,
   "style": "dark",
   "tags": [
-    "openvpn_exporter",
-    "openvpn_server1_status"
+    "ds_prometheus",
+    "openvpn_exporter"
   ],
   "templating": {
     "list": [
       {
         "current": {
+          "isNone": true,
           "selected": false,
-          "text": "localhost:9176",
-          "value": "localhost:9176"
+          "text": "None",
+          "value": ""
         },
         "datasource": {
           "type": "prometheus",
@@ -1547,6 +1546,6 @@
   "timezone": "browser",
   "title": "OpenVPN ovpns1 Metrics",
   "uid": "y_KAxA3Zz",
-  "version": 8,
+  "version": 1,
   "weekStart": ""
 }
