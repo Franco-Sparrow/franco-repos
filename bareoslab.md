@@ -3,7 +3,7 @@
   - [1.1. Testing MariaDB backups](#11-testing-mariadb-backups)
   - [1.2. Preparaing the restore of MariaDB full backup](#12-preparaing-the-restore-of-mariadb-full-backup)
   - [1.3. Testing the restore of MariaDB full backups](#13-testing-the-restore-of-mariadb-full-backups)
-  - [1.4. Preparing the restore of MariaDB incremental backup](#14-preparing-the-restore-of-mariadb-incremental-backup)
+  - [1.4. Preparing the restore of MariaDB incremental backup inc1](#14-preparing-the-restore-of-mariadb-incremental-backup-inc1)
   - [1.5. Testing the restore of MariaDB incremental backup inc1](#15-testing-the-restore-of-MariaDB-incremental-backup-inc1)
 
 # 1. MariaDB backups and restore lab with Bareos
@@ -209,7 +209,7 @@ Get access to Zabbix frontend, **all galera hosts should appear enabled!!!**.
 
 ![Galera hosts status after restored the Full backup](https://github.com/Franco-Sparrow/franco-repos/assets/56793015/ccea5c18-aaaa-48d0-bdea-bac94e341fe0)
 
-## 1.4. Preparing the restore of MariaDB incremental backup
+## 1.4. Preparing the restore of MariaDB incremental backup inc1
 
 > **NOTE** <br />
 > The following steps should be done on each one of the galera nodes.
@@ -243,9 +243,40 @@ mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_re
 
 ```bash
 mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
+[00] 2023-06-05 08:35:16 incremental backup from 2643581203 is enabled.
+[00] 2023-06-05 08:35:16 cd to /tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280/
+[00] 2023-06-05 08:35:16 open files limit requested 0, set to 1024
+[00] 2023-06-05 08:35:16 This target seems to be already prepared.
+[00] 2023-06-05 08:35:16 mariabackup: using the following InnoDB configuration for recovery:
+[00] 2023-06-05 08:35:16 innodb_data_home_dir = .
+[00] 2023-06-05 08:35:16 innodb_data_file_path = ibdata1:12M;ibdata2:12M:autoextend
+[00] 2023-06-05 08:35:16 innodb_log_group_home_dir = /tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/289/00000000002643581203_00000000002643581203_0000000283/
+[00] 2023-06-05 08:35:16 InnoDB: Using Linux native AIO
+[00] 2023-06-05 08:35:16 mariabackup: Generating a list of tablespaces
 # [...]
-[00] 2023-05-02 15:08:35         ...done
-[00] 2023-05-02 15:08:35 completed OK!
+[00] 2023-06-05 08:35:17 mariabackup: using the following InnoDB configuration for recovery:
+[00] 2023-06-05 08:35:17 innodb_data_home_dir = .
+[00] 2023-06-05 08:35:17 innodb_data_file_path = ibdata1:12M;ibdata2:12M:autoextend
+[00] 2023-06-05 08:35:17 innodb_log_group_home_dir = /tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/289/00000000002643581203_00000000002643581203_0000000283/
+[00] 2023-06-05 08:35:17 InnoDB: Using Linux native AIO
+[00] 2023-06-05 08:35:17 Starting InnoDB instance for recovery.
+[00] 2023-06-05 08:35:17 mariabackup: Using 104857600 bytes for buffer pool (set by --use-memory parameter)
+2023-06-05  8:35:17 0 [Note] InnoDB: Compressed tables use zlib 1.2.11
+2023-06-05  8:35:17 0 [Note] InnoDB: Number of pools: 1
+2023-06-05  8:35:17 0 [Note] InnoDB: Using generic crc32 instructions
+2023-06-05  8:35:17 0 [Note] InnoDB: Using Linux native AIO
+2023-06-05  8:35:17 0 [Note] InnoDB: Initializing buffer pool, total size = 104857600, chunk size = 104857600
+2023-06-05  8:35:17 0 [Note] InnoDB: Completed initialization of buffer pool
+2023-06-05  8:35:17 0 [Note] InnoDB: Starting crash recovery from checkpoint LSN=2643581203,2649216325
+2023-06-05  8:35:17 0 [Warning] InnoDB: Are you sure you are using the right ib_logfile0 to start up the database? Log sequence number in the ib_logfile0 is 2643581203, less than the log sequence number in
+the first system tablespace file header, 2652201304.
+2023-06-05  8:35:17 0 [Note] InnoDB: Starting a batch to recover 2622 pages from redo log.
+2023-06-05  8:35:18 0 [Note] InnoDB: Starting final batch to recover 1535 pages from redo log.
+[00] 2023-06-05 08:35:18 Last binlog file , position 0
+[00] 2023-06-05 08:35:18 mariabackup: Recovered WSREP position: 878e7dec-e939-11ed-b0f4-e2ae8c5063b2:2726918
+# [...]
+[00] 2023-06-05 08:35:18         ...done
+[00] 2023-06-05 08:35:18 completed OK!
 ```
 
 *Now the resulting backup has FULL+INC1 and is ready to be restored in MariaDB!!!*
