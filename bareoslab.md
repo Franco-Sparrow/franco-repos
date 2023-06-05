@@ -80,7 +80,12 @@ mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
 
 *Now the FULL backup is ready to be restored in MariaDB!!!*
 
-Stop mariadb.service and delete all files from mariadb data dir:
+> **NOTE** <br />
+>
+> Do not continue until the others galera nodes restore their full backups too.
+>
+
+If you have finised with the other galera nodes, stop mariadb.service and delete all files from mariadb data dir:
 
 ```bash
 systemctl stop mariadb.service && \
