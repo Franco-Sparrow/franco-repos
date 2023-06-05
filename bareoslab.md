@@ -89,8 +89,8 @@ mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
 >
 > Do not continue until the others galera nodes restore their full backups too. <br />
 >
-> - The full_not_ready for galeradb2: `288/00000000000000000000_00000000002642910854_0000000281`
-> - The full_not_ready for galeradb3: `287/00000000000000000000_00000000002643923766_0000000282`
+> - For galeradb2: `mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/288/00000000000000000000_00000000002642910854_0000000281`
+> - For galeradb3: `mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/287/00000000000000000000_00000000002643923766_0000000282`
 >
 
 ## 1.3. Testing the restore of MariaDB full backups
@@ -285,8 +285,8 @@ the first system tablespace file header, 2652201304.
 >
 > Do not continue until the others galera nodes restore their full backups too. <br />
 >
-> - The inc1_not_ready for galeradb2: `290/00000000002642910854_00000000002642910854_0000000285`
-> - The inc1_not_ready for galeradb3: `287/00000000000000000000_00000000002643923766_0000000282`
+> - For galeradb2: `mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/288/00000000000000000000_00000000002642910854_0000000281 --incremental-dir=/tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/290/00000000002642910854_00000000002642910854_0000000285`
+> - For galeradb3: `mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/288/00000000000000000000_00000000002642910854_0000000281 --incremental-dir=/tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/290/00000000002642910854_00000000002642910854_0000000285`
 
 
 ## 1.5. Testing the restore of MariaDB incremental backup inc1
