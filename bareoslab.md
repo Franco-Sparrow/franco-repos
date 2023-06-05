@@ -297,7 +297,7 @@ the first system tablespace file header, 2652201304.
 > ```
 > - For galeradb3: <br />
 > ```bash
-> mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/287/00000000000000000000_00000000002643923766_0000000282 --incremental-dir=/tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/290/00000000002642910854_00000000002642910854_0000000285
+> mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/287/00000000000000000000_00000000002643923766_0000000282 --incremental-dir=/tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/291/00000000002643923766_00000000002643923766_0000000284
 > ```
 >
 
