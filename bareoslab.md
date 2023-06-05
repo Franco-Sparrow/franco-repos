@@ -48,8 +48,7 @@ mariabackup --prepare \
 ```
 
 ```bash
-mariabackup --prepare \
-  --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280
+mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280
 ```
 
 The output is as follow:
@@ -141,8 +140,7 @@ mariabackup --copy-back \
 ```
 
 ```bash
-mariabackup --copy-back \
-  --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280
+mariabackup --copy-back --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280
 ```
 
 The output is as follow:
@@ -232,9 +230,7 @@ mariabackup --prepare \
 ```
 
 ```bash
-mariabackup --prepare \
-  --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280 \
-  --incremental-dir=/tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/172/00000000001093163231_00000000001093163231_0000000158
+mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280 --incremental-dir=/tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/172/00000000001093163231_00000000001093163231_0000000158
 ```
 
 ```bash
@@ -308,8 +304,7 @@ mariabackup --copy-back \
 ```
 
 ```bash
-mariabackup --copy-back \
-  --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
+mariabackup --copy-back --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
 ```
 
 The output is as follow:
