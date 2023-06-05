@@ -28,7 +28,7 @@ The following laboratory was made to be as close as possible of a real case:
 
 Restore the FULL backup from Bareos WebUI, specifying the directory `/tmp/bareos-restores/MariaDB/full_not_ready`.
 
-> **NOTE** <br /
+> **NOTE** <br />
 >
 > This is not mandatory, this steps are only for the testing the restores.
 > 
