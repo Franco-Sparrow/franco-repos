@@ -11,11 +11,11 @@ The following laboratory was made to be as close as possible of a real case:
 ## 1.1. Testing backups
 
 - Galera2 is the primary node (backup allways after Galera1 and Galera3).
-- The hosts `galeradb1`, `galeradb2` and `galeradb3` are disabled in Zabbix.
+- The hosts `galeradb1`, `galeradb2` and `galeradb3` are enabled in Zabbix.
 - Backup FULL for Galera1: `Virtalus-Galera1-MariaDB-FULL-2023-5-2-12:22:6-Vol0`.
 - Backup FULL for Galera3: `Virtalus-Galera3-MariaDB-FULL-2023-5-2-12:22:46-Vol0`.
 - Backup FULL for Galera2: `Virtalus-Galera2-MariaDB-FULL-2023-5-2-12:23:21-Vol0`.
-- The hosts `galeradb2` and `galeradb2` are disabled while `galeradb1` is enabled in Zabbix.
+- The hosts `galeradb2` and `galeradb2` are enabled while `galeradb1` is disabled in Zabbix.
 - Backup INC1 for Galera1: `Virtalus-Galera1-MariaDB-INCREMENTAL-2023-5-2-12:37:11-Vol0`.
 - Backup INC1 for Galera3: `Virtalus-Galera3-MariaDB-INCREMENTAL-2023-5-2-12:38:25-Vol0`.
 - Backup INC1 for Galera2: `Virtalus-Galera2-MariaDB-INCREMENTAL-2023-5-2-12:39:30-Vol0`.
@@ -178,9 +178,9 @@ mysql -uroot -e "SELECT * FROM information_schema.global_status WHERE variable_n
 > systemctl start haproxy.service
 > ```
 
-Get access to Zabbix frontend, **all galera hosts should appear disabled!!!**.
+Get access to Zabbix frontend, **all galera hosts should appear enabled!!!**.
 
-![Galera hosts status after restored the Full backup](https://github.com/Franco-Sparrow/franco-repos/blob/master/bareoslab2.jpg?raw=true)
+![Galera hosts status after restored the Full backup](https://github.com/Franco-Sparrow/franco-repos/assets/56793015/ccea5c18-aaaa-48d0-bdea-bac94e341fe0)
 
 ## 1.3. Testing the restore of INC1 backup
 
@@ -331,6 +331,6 @@ mysql -uroot -e "SELECT * FROM information_schema.global_status WHERE variable_n
 > systemctl star haproxy.service
 > ```
 
-Get access to Zabbix frontend, **the hosts `galeradb2` and `galeradb2` should be disabled while `galeradb1` should be enabled!!!**.
+Get access to Zabbix frontend, **the hosts `galeradb2` and `galeradb2` should be enabled while `galeradb1` should be disabled!!!**.
 
-![Galera hosts status after restored the Incremental backup](https://github.com/Franco-Sparrow/franco-repos/blob/master/bareoslab3.jpg?raw=true)
+![Galera hosts status after restored the Incremental backup](https://github.com/Franco-Sparrow/franco-repos/assets/56793015/ea97b0a2-b8d8-49a6-a43a-2238128cf458)
