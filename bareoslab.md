@@ -1,4 +1,10 @@
 # INDEX
+- [1. MariaDB backups and restore lab with Bareos](#1-mariadb-backups-and-restore-lab-with-bareos)
+- [1.1. Testing MariaDB backups](#11-testing-mariadb-backups)
+- [1.2. Preparaing the restore of MariaDB full backup](#12-preparaing-the-restore-of-mariadb-full-backup)
+- [1.3. Testing the restore of MariaDB full backups](#13-testing-the-restore-of-mariadb-full-backups)
+- [1.4. Preparing the restore of MariaDB incremental backup](#14-preparing-the-restore-of-mariadb-incremental-backup)
+- [1.5. Testing the restore of MariaDB incremental backup inc1](#15-testing-the-restore-of-MariaDB-incremental-backup-inc1)
 
 # 1. MariaDB backups and restore lab with Bareos
 
@@ -8,7 +14,7 @@ The following laboratory was made to be as close as possible of a real case:
 
 ![Network diagram](https://github.com/Franco-Sparrow/franco-repos/blob/master/WhatsApp%20Image%202023-04-17%20at%202.43.57%20PM.jpeg?raw=true)
 
-## 1.1. Testing backups
+## 1.1. Testing MariaDB backups
 
 - Galera2 is the primary node (backup allways after Galera1 and Galera3).
 - The hosts `galeradb1`, `galeradb2` and `galeradb3` are enabled in Zabbix.
@@ -20,7 +26,7 @@ The following laboratory was made to be as close as possible of a real case:
 - Backup INC1 for Galera3: `Virtalus-Galera3-MariaDB-INCREMENTAL-2023-5-2-12:38:25-Vol0`.
 - Backup INC1 for Galera2: `Virtalus-Galera2-MariaDB-INCREMENTAL-2023-5-2-12:39:30-Vol0`.
 
-## 1.2. Testing the restore of FULL backup
+## 1.2. Preparaing the restore of MariaDB full backup
 
 > **NOTE** <br />
 > The following steps should be done on each one of the Galera nodes.
@@ -86,6 +92,8 @@ mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
 > - For galeradb2: `288/00000000000000000000_00000000002642910854_0000000281`
 > - For galeradb3: `287/00000000000000000000_00000000002643923766_0000000282`
 >
+
+## 1.3. Testing the restore of MariaDB full backups
 
 If you have finised with the other galera nodes, stop mariadb.service and delete all files from mariadb data dir:
 
@@ -201,13 +209,13 @@ Get access to Zabbix frontend, **all galera hosts should appear enabled!!!**.
 
 ![Galera hosts status after restored the Full backup](https://github.com/Franco-Sparrow/franco-repos/assets/56793015/ccea5c18-aaaa-48d0-bdea-bac94e341fe0)
 
-## 1.3. Testing the restore of INC1 backup
+## 1.4. Preparing the restore of MariaDB incremental backup
 
 > **NOTE** <br />
-> The following steps should be done on each one of the Galera nodes.
+> The following steps should be done on each one of the galera nodes.
 >
 
-Restore the INC1 backup, specifying the directory `/tmp/bareos-restores/MariaDB/inc1_not_ready`.
+Restore the inc1 backup, specifying the directory `/tmp/bareos-restores/MariaDB/inc1_not_ready`.
 
 > **NOTE** <br /
 >
@@ -241,6 +249,8 @@ mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
 ```
 
 *Now the resulting backup has FULL+INC1 and is ready to be restored in MariaDB!!!*
+
+## 1.5. Testing the restore of MariaDB incremental backup inc1
 
 Stop mariadb.service and delete all files from mariadb data dir:
 
