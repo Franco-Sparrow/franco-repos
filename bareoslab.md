@@ -56,27 +56,26 @@ The output is as follow:
 
 ```bash
 mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
-[00] 2023-05-02 14:03:20 cd to /tmp/bareos-restores/MariaDB/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280/
-[00] 2023-05-02 14:03:20 open files limit requested 0, set to 1024
-[00] 2023-05-02 14:03:20 This target seems to be not prepared yet.
-[00] 2023-05-02 14:03:20 mariabackup: using the following InnoDB configuration for recovery:
-[00] 2023-05-02 14:03:20 innodb_data_home_dir = .
-[00] 2023-05-02 14:03:20 innodb_data_file_path = ibdata1:12M;ibdata2:12M:autoextend
-[00] 2023-05-02 14:03:20 innodb_log_group_home_dir = .
-[00] 2023-05-02 14:03:20 InnoDB: Using Linux native AIO
-[00] 2023-05-02 14:03:20 Starting InnoDB instance for recovery.
-[00] 2023-05-02 14:03:20 mariabackup: Using 104857600 bytes for buffer pool (set by --use-memory parameter)
-2023-05-02 14:03:20 0 [Note] InnoDB: Compressed tables use zlib 1.2.11
-2023-05-02 14:03:20 0 [Note] InnoDB: Number of pools: 1
-2023-05-02 14:03:20 0 [Note] InnoDB: Using generic crc32 instructions
-2023-05-02 14:03:20 0 [Note] InnoDB: Using Linux native AIO
-2023-05-02 14:03:20 0 [Note] InnoDB: Initializing buffer pool, total size = 104857600, chunk size = 104857600
-2023-05-02 14:03:20 0 [Note] InnoDB: Completed initialization of buffer pool
-2023-05-02 14:03:20 0 [Note] InnoDB: Starting crash recovery from checkpoint LSN=2643581203,2643581203
-2023-05-02 14:03:21 0 [Note] InnoDB: Starting a batch to recover 2787 pages from redo log.
-2023-05-02 14:03:21 0 [Note] InnoDB: Starting final batch to recover 467 pages from redo log.
-[00] 2023-05-02 14:03:21 Last binlog file , position 0
-[00] 2023-05-02 14:03:21 completed OK!
+[00] 2023-06-05 07:12:22 cd to /tmp/bareos-restores/MariaDB/full_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280/
+[00] 2023-06-05 07:12:22 open files limit requested 0, set to 1024
+[00] 2023-06-05 07:12:22 This target seems to be not prepared yet.
+[00] 2023-06-05 07:12:22 mariabackup: using the following InnoDB configuration for recovery:
+[00] 2023-06-05 07:12:22 innodb_data_home_dir = .
+[00] 2023-06-05 07:12:22 innodb_data_file_path = ibdata1:12M;ibdata2:12M:autoextend
+[00] 2023-06-05 07:12:22 innodb_log_group_home_dir = .
+[00] 2023-06-05 07:12:22 InnoDB: Using Linux native AIO
+[00] 2023-06-05 07:12:22 Starting InnoDB instance for recovery.
+[00] 2023-06-05 07:12:22 mariabackup: Using 104857600 bytes for buffer pool (set by --use-memory parameter)
+2023-06-05  7:12:22 0 [Note] InnoDB: Compressed tables use zlib 1.2.11
+2023-06-05  7:12:22 0 [Note] InnoDB: Number of pools: 1
+2023-06-05  7:12:22 0 [Note] InnoDB: Using generic crc32 instructions
+2023-06-05  7:12:22 0 [Note] InnoDB: Using Linux native AIO
+2023-06-05  7:12:22 0 [Note] InnoDB: Initializing buffer pool, total size = 104857600, chunk size = 104857600
+2023-06-05  7:12:22 0 [Note] InnoDB: Completed initialization of buffer pool
+2023-06-05  7:12:22 0 [Note] InnoDB: Starting crash recovery from checkpoint LSN=2643581203,2649216325
+2023-06-05  7:12:22 0 [Note] InnoDB: Starting final batch to recover 1884 pages from redo log.
+[00] 2023-06-05 07:12:23 Last binlog file , position 0
+[00] 2023-06-05 07:12:23 completed OK!
 ```
 
 *Now the FULL backup is ready to be restored in MariaDB!!!*
