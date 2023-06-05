@@ -1,10 +1,10 @@
 # INDEX
 - [1. MariaDB backups and restore lab with Bareos](#1-mariadb-backups-and-restore-lab-with-bareos)
-- [1.1. Testing MariaDB backups](#11-testing-mariadb-backups)
-- [1.2. Preparaing the restore of MariaDB full backup](#12-preparaing-the-restore-of-mariadb-full-backup)
-- [1.3. Testing the restore of MariaDB full backups](#13-testing-the-restore-of-mariadb-full-backups)
-- [1.4. Preparing the restore of MariaDB incremental backup](#14-preparing-the-restore-of-mariadb-incremental-backup)
-- [1.5. Testing the restore of MariaDB incremental backup inc1](#15-testing-the-restore-of-MariaDB-incremental-backup-inc1)
+  - [1.1. Testing MariaDB backups](#11-testing-mariadb-backups)
+  - [1.2. Preparaing the restore of MariaDB full backup](#12-preparaing-the-restore-of-mariadb-full-backup)
+  - [1.3. Testing the restore of MariaDB full backups](#13-testing-the-restore-of-mariadb-full-backups)
+  - [1.4. Preparing the restore of MariaDB incremental backup](#14-preparing-the-restore-of-mariadb-incremental-backup)
+  - [1.5. Testing the restore of MariaDB incremental backup inc1](#15-testing-the-restore-of-MariaDB-incremental-backup-inc1)
 
 # 1. MariaDB backups and restore lab with Bareos
 
