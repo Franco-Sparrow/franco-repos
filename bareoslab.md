@@ -23,9 +23,21 @@ The following laboratory was made to be as close as possible of a real case:
 ## 1.2. Testing the restore of FULL backup
 
 > **NOTE** <br />
-> The following steps should be done on each one of the galera nodes.
+> The following steps should be done on each one of the Galera nodes.
+> >
 
-Restore the FULL backup, specifying the directory `/root/bareos-restores/MariaDB`.
+Restore the FULL backup from Bareos WebUI, specifying the directory `/root/bareos-restores/MariaDB/full_ready`.
+
+> **NOTE** <br /
+>
+> This is not mandatory, this steps are only for the testing the restores.
+> 
+> Make a copy of the restored files:
+> ```bash
+> mkdir -p /root/bareos-restores/MariaDB/full_not_ready && \
+> cp -r /root/bareos-restores/MariaDB/full_ready/* /root/bareos-restores/MariaDB/full_not_ready/
+> ```
+>
 
 Prepare the backup, for example, for Galera1 it would will be as follow:
 
@@ -36,7 +48,7 @@ mariabackup --prepare \
 
 ```bash
 mariabackup --prepare \
-  --target-dir=/root/bareos-restores/MariaDB/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
+  --target-dir=/root/bareos-restores/MariaDB/full_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
 ```
 
 The output is as follow:
@@ -122,7 +134,7 @@ mariabackup --copy-back \
 
 ```bash
 mariabackup --copy-back \
-  --target-dir=/root/bareos-restores/MariaDB/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
+  --target-dir=/root/bareos-restores/MariaDB/full_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
 ```
 
 The output is as follow:
@@ -174,9 +186,10 @@ mysql -uroot -e "SELECT * FROM information_schema.global_status WHERE variable_n
 > **NOTE** <br />
 > If your galera is behind an LB (ie, haproxy), start the service: <br />
 >
-> ```
+> ```bash
 > systemctl start haproxy.service
 > ```
+> >
 
 Get access to Zabbix frontend, **all galera hosts should appear enabled!!!**.
 
@@ -185,9 +198,23 @@ Get access to Zabbix frontend, **all galera hosts should appear enabled!!!**.
 ## 1.3. Testing the restore of INC1 backup
 
 > **NOTE** <br />
-> The following steps should be done on each one of the galera nodes.
+> The following steps should be done on each one of the Galera nodes.
+>
 
-Restore the INC1 backup, specifying the directory `/root/bareos-restores/MariaDB`.
+Restore the INC1 backup, specifying the directory `/root/bareos-restores/MariaDB/inc1_ready`.
+
+> **NOTE** <br /
+>
+> This is not mandatory, this steps are only for the testing the restores.
+> 
+> Make a copy of the restored files:
+> ```bash
+> mkdir -p /root/bareos-restores/MariaDB/inc1_not_ready && \
+> mkdir -p /root/bareos-restores/MariaDB/full_and_inc1_ready && \
+> cp -r /root/bareos-restores/MariaDB/inc1_ready/* /root/bareos-restores/MariaDB/inc1_not_ready/ && \
+> cp -r /root/bareos-restores/MariaDB/full_ready/* /root/bareos-restores/MariaDB/full_and_inc1_ready/
+> ```
+> 
 
 Prepare the backup, for example, for Galera1 it would will be as follow:
 
@@ -199,8 +226,8 @@ mariabackup --prepare \
 
 ```bash
 mariabackup --prepare \
-  --target-dir=/root/bareos-restores/MariaDB/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155 \
-  --incremental-dir=/root/bareos-restores/MariaDB/_mariabackup/172/00000000001093163231_00000000001093163231_0000000158
+  --target-dir=/root/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155 \
+  --incremental-dir=/root/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/172/00000000001093163231_00000000001093163231_0000000158
 ```
 
 ```bash
