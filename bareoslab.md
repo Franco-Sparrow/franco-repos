@@ -89,8 +89,8 @@ mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
 >
 > Do not continue until the others galera nodes restore their full backups too. <br />
 >
-> - For galeradb2: `288/00000000000000000000_00000000002642910854_0000000281`
-> - For galeradb3: `287/00000000000000000000_00000000002643923766_0000000282`
+> - The full_not_ready for galeradb2: `288/00000000000000000000_00000000002642910854_0000000281`
+> - The full_not_ready for galeradb3: `287/00000000000000000000_00000000002643923766_0000000282`
 >
 
 ## 1.3. Testing the restore of MariaDB full backups
@@ -280,6 +280,14 @@ the first system tablespace file header, 2652201304.
 ```
 
 *Now the resulting backup has FULL+INC1 and is ready to be restored in MariaDB!!!*
+
+> **NOTE** <br />
+>
+> Do not continue until the others galera nodes restore their full backups too. <br />
+>
+> - The inc1_not_ready for galeradb2: `290/00000000002642910854_00000000002642910854_0000000285`
+> - The inc1_not_ready for galeradb3: `287/00000000000000000000_00000000002643923766_0000000282`
+
 
 ## 1.5. Testing the restore of MariaDB incremental backup inc1
 
