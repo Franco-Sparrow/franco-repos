@@ -26,10 +26,10 @@ The following laboratory was made to be as close as possible of a real case:
 - Backup INC1 for Galera3: `Virtalus-Galera3-MariaDB-INCREMENTAL-2023-5-2-12:38:25-Vol0`.
 - Backup INC1 for Galera2: `Virtalus-Galera2-MariaDB-INCREMENTAL-2023-5-2-12:39:30-Vol0`.
 
-## 1.2. Preparaing the restore of MariaDB full backup
+## 1.2. Preparing the restore of MariaDB full backup
 
 > **NOTE** <br />
-> The following steps should be done on each one of the Galera nodes.
+> The following steps should be done on each one of the galera nodes.
 >
 
 Restore the FULL backup from Bareos WebUI, specifying the directory `/tmp/bareos-restores/MariaDB/full_not_ready`.
@@ -87,7 +87,7 @@ mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
 
 > **NOTE** <br />
 >
-> Do not continue until the others galera nodes restore their full backups too. <br />
+> Do not continue until the others galera nodes prepare their full backups too. <br />
 >
 > - For galeradb2: <br />
 > ```bash
@@ -173,19 +173,33 @@ chown -R mysql:mysql /var/lib/mysql/
 
 *Once you have done the previous steps for all galera nodes, proceed to start the mariadb.service!!!*
 
-Start mariadb on last primary node from Galera (on Galera2):
+> **NOTE** <br />
+>
+> Do not continue until the others galera nodes restore their full backups too. <br />
+>
+> - For galeradb2: <br /> 
+> ```bash
+> mariabackup --copy-back --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/288/00000000000000000000_00000000002642910854_0000000281
+> ```
+> - For galeradb3: <br />
+> ```bash
+> mariabackup --copy-back --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/287/00000000000000000000_00000000002643923766_0000000282
+> ```
+>
+
+Start mariadb on last primary node from galera (on galeradb2):
 
 ```bash
 galera_new_cluster
 ```
 
-Start mariadb on the other nodes (Galera1 and Galera3):
+Start mariadb on the other nodes (galeradb1 and galeradb3):
 
 ```bash
 systemctl start mariadb.service
 ```
 
-Verify the state of the Galera cluster:
+Verify the state of the galera cluster:
 
 ```bash
 mysql -uroot -e "SELECT * FROM information_schema.global_status WHERE variable_name IN ('WSREP_CLUSTER_STATUS','WSREP_LOCAL_STATE_COMMENT','WSREP_CLUSTER_SIZE','WSREP_EVS_DELAYED','WSREP_READY');"
@@ -289,7 +303,7 @@ the first system tablespace file header, 2652201304.
 
 > **NOTE** <br />
 >
-> Do not continue until the others galera nodes restore their full backups too. <br />
+> Do not continue until the others galera nodes prepare their full+inc1 backups too. <br />
 >
 > - For galeradb2: <br /> 
 > ```bash
@@ -384,19 +398,33 @@ chown -R mysql:mysql /var/lib/mysql/
 
 *Once you have done the previous steps for all galera nodes, proceed to start the mariadb.service!!!*
 
-Start mariadb on last primary node from Galera (**Galera2**):
+> **NOTE** <br />
+>
+> Do not continue until the others galera nodes restore their full+inc1 backups too. <br />
+>
+> - For galeradb2: <br /> 
+> ```bash
+> mariabackup --copy-back --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/288/00000000000000000000_00000000002642910854_0000000281
+> ```
+> - For galeradb3: <br />
+> ```bash
+> mariabackup --copy-back --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/287/00000000000000000000_00000000002643923766_0000000282
+> ```
+>
+
+Start mariadb on last primary node from galera (**galeradb2**):
 
 ```bash
 galera_new_cluster
 ```
 
-Start mariadb on the other nodes (Galera1 and Galera3):
+Start mariadb on the other nodes (galera1 and galera3):
 
 ```bash
 systemctl start mariadb.service
 ```
 
-Verify the state of the Galera cluster:
+Verify the state of the galera cluster:
 
 ```bash
 mysql -uroot -e "SELECT * FROM information_schema.global_status WHERE variable_name IN ('WSREP_CLUSTER_STATUS','WSREP_LOCAL_STATE_COMMENT','WSREP_CLUSTER_SIZE','WSREP_EVS_DELAYED','WSREP_READY');"
