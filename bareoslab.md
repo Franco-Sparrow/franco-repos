@@ -238,7 +238,7 @@ mariabackup --prepare \
 ```
 
 ```bash
-mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280 --incremental-dir=/tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/172/00000000001093163231_00000000001093163231_0000000158
+mariabackup --prepare --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280 --incremental-dir=/tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/289/00000000002643581203_00000000002643581203_0000000283
 ```
 
 ```bash
