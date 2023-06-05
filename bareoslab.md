@@ -48,14 +48,14 @@ mariabackup --prepare \
 
 ```bash
 mariabackup --prepare \
-  --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
+  --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280
 ```
 
 The output is as follow:
 
 ```bash
 mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
-[00] 2023-05-02 14:03:20 cd to /tmp/bareos-restores/MariaDB/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155/
+[00] 2023-05-02 14:03:20 cd to /tmp/bareos-restores/MariaDB/_mariabackup/286/00000000000000000000_00000000002643581203_0000000280/
 [00] 2023-05-02 14:03:20 open files limit requested 0, set to 1024
 [00] 2023-05-02 14:03:20 This target seems to be not prepared yet.
 [00] 2023-05-02 14:03:20 mariabackup: using the following InnoDB configuration for recovery:
@@ -71,7 +71,7 @@ mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
 2023-05-02 14:03:20 0 [Note] InnoDB: Using Linux native AIO
 2023-05-02 14:03:20 0 [Note] InnoDB: Initializing buffer pool, total size = 104857600, chunk size = 104857600
 2023-05-02 14:03:20 0 [Note] InnoDB: Completed initialization of buffer pool
-2023-05-02 14:03:20 0 [Note] InnoDB: Starting crash recovery from checkpoint LSN=1093163231,1093163231
+2023-05-02 14:03:20 0 [Note] InnoDB: Starting crash recovery from checkpoint LSN=2643581203,2643581203
 2023-05-02 14:03:21 0 [Note] InnoDB: Starting a batch to recover 2787 pages from redo log.
 2023-05-02 14:03:21 0 [Note] InnoDB: Starting final batch to recover 467 pages from redo log.
 [00] 2023-05-02 14:03:21 Last binlog file , position 0
