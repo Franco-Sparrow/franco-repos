@@ -24,7 +24,7 @@ The following laboratory was made to be as close as possible of a real case:
 
 > **NOTE** <br />
 > The following steps should be done on each one of the Galera nodes.
-> >
+>
 
 Restore the FULL backup from Bareos WebUI, specifying the directory `/tmp/bareos-restores/MariaDB/full_not_ready`.
 
@@ -34,6 +34,7 @@ Restore the FULL backup from Bareos WebUI, specifying the directory `/tmp/bareos
 > 
 > Make a copy of the restored files:
 > ```bash
+> rm -rf /tmp/bareos-restores/MariaDB/full_ready && \
 > mkdir -p /tmp/bareos-restores/MariaDB/full_ready && \
 > cp -r /tmp/bareos-restores/MariaDB/full_not_ready/* /tmp/bareos-restores/MariaDB/full_ready/
 > ```
@@ -209,6 +210,7 @@ Restore the INC1 backup, specifying the directory `/tmp/bareos-restores/MariaDB/
 > 
 > Make a copy of the restored files:
 > ```bash
+> rm -rf /tmp/bareos-restores/MariaDB/full_and_inc1_ready && \
 > mkdir -p /tmp/bareos-restores/MariaDB/full_and_inc1_ready && \
 > cp -r /tmp/bareos-restores/MariaDB/full_ready/* /tmp/bareos-restores/MariaDB/full_and_inc1_ready/
 > ```
