@@ -252,7 +252,7 @@ mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
 
 ## 1.5. Testing the restore of MariaDB incremental backup inc1
 
-Stop mariadb.service and delete all files from mariadb data dir:
+If you have finised with the other galera nodes, stop mariadb.service and delete all files from mariadb data dir:
 
 ```bash
 systemctl stop mariadb.service && \
