@@ -26,7 +26,7 @@ The following laboratory was made to be as close as possible of a real case:
 > The following steps should be done on each one of the Galera nodes.
 > >
 
-Restore the FULL backup from Bareos WebUI, specifying the directory `/root/bareos-restores/MariaDB/full_ready`.
+Restore the FULL backup from Bareos WebUI, specifying the directory `/tmp/bareos-restores/MariaDB/full_ready`.
 
 > **NOTE** <br /
 >
@@ -34,8 +34,8 @@ Restore the FULL backup from Bareos WebUI, specifying the directory `/root/bareo
 > 
 > Make a copy of the restored files:
 > ```bash
-> mkdir -p /root/bareos-restores/MariaDB/full_not_ready && \
-> cp -r /root/bareos-restores/MariaDB/full_ready/* /root/bareos-restores/MariaDB/full_not_ready/
+> mkdir -p /tmp/bareos-restores/MariaDB/full_not_ready && \
+> cp -r /tmp/bareos-restores/MariaDB/full_ready/* /tmp/bareos-restores/MariaDB/full_not_ready/
 > ```
 >
 
@@ -48,14 +48,14 @@ mariabackup --prepare \
 
 ```bash
 mariabackup --prepare \
-  --target-dir=/root/bareos-restores/MariaDB/full_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
+  --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
 ```
 
 The output is as follow:
 
 ```bash
 mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
-[00] 2023-05-02 14:03:20 cd to /root/bareos-restores/MariaDB/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155/
+[00] 2023-05-02 14:03:20 cd to /tmp/bareos-restores/MariaDB/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155/
 [00] 2023-05-02 14:03:20 open files limit requested 0, set to 1024
 [00] 2023-05-02 14:03:20 This target seems to be not prepared yet.
 [00] 2023-05-02 14:03:20 mariabackup: using the following InnoDB configuration for recovery:
@@ -134,7 +134,7 @@ mariabackup --copy-back \
 
 ```bash
 mariabackup --copy-back \
-  --target-dir=/root/bareos-restores/MariaDB/full_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
+  --target-dir=/tmp/bareos-restores/MariaDB/full_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
 ```
 
 The output is as follow:
@@ -201,7 +201,7 @@ Get access to Zabbix frontend, **all galera hosts should appear enabled!!!**.
 > The following steps should be done on each one of the Galera nodes.
 >
 
-Restore the INC1 backup, specifying the directory `/root/bareos-restores/MariaDB/inc1_ready`.
+Restore the INC1 backup, specifying the directory `/tmp/bareos-restores/MariaDB/inc1_ready`.
 
 > **NOTE** <br /
 >
@@ -209,10 +209,10 @@ Restore the INC1 backup, specifying the directory `/root/bareos-restores/MariaDB
 > 
 > Make a copy of the restored files:
 > ```bash
-> mkdir -p /root/bareos-restores/MariaDB/inc1_not_ready && \
-> mkdir -p /root/bareos-restores/MariaDB/full_and_inc1_ready && \
-> cp -r /root/bareos-restores/MariaDB/inc1_ready/* /root/bareos-restores/MariaDB/inc1_not_ready/ && \
-> cp -r /root/bareos-restores/MariaDB/full_ready/* /root/bareos-restores/MariaDB/full_and_inc1_ready/
+> mkdir -p /tmp/bareos-restores/MariaDB/inc1_not_ready && \
+> mkdir -p /tmp/bareos-restores/MariaDB/full_and_inc1_ready && \
+> cp -r /tmp/bareos-restores/MariaDB/inc1_ready/* /tmp/bareos-restores/MariaDB/inc1_not_ready/ && \
+> cp -r /tmp/bareos-restores/MariaDB/full_ready/* /tmp/bareos-restores/MariaDB/full_and_inc1_ready/
 > ```
 > 
 
@@ -226,8 +226,8 @@ mariabackup --prepare \
 
 ```bash
 mariabackup --prepare \
-  --target-dir=/root/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155 \
-  --incremental-dir=/root/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/172/00000000001093163231_00000000001093163231_0000000158
+  --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155 \
+  --incremental-dir=/tmp/bareos-restores/MariaDB/inc1_not_ready/_mariabackup/172/00000000001093163231_00000000001093163231_0000000158
 ```
 
 ```bash
@@ -302,7 +302,7 @@ mariabackup --copy-back \
 
 ```bash
 mariabackup --copy-back \
-  --target-dir=/root/bareos-restores/MariaDB/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
+  --target-dir=/tmp/bareos-restores/MariaDB/full_and_inc1_ready/_mariabackup/167/00000000000000000000_00000000001093163231_0000000155
 ```
 
 The output is as follow:
@@ -357,6 +357,7 @@ mysql -uroot -e "SELECT * FROM information_schema.global_status WHERE variable_n
 > ```
 > systemctl star haproxy.service
 > ```
+> 
 
 Get access to Zabbix frontend, **the hosts `galeradb2` and `galeradb2` should be enabled while `galeradb1` should be disabled!!!**.
 
