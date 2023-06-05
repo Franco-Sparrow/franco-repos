@@ -83,6 +83,7 @@ mariabackup based on MariaDB server 10.6.12-MariaDB debian-linux-gnu (x86_64)
 > **NOTE** <br />
 >
 > Do not continue until the others galera nodes restore their full backups too.
+> For galeradb2: `288/00000000000000000000_00000000002642910854_0000000281`
 >
 
 If you have finised with the other galera nodes, stop mariadb.service and delete all files from mariadb data dir:
